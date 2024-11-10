@@ -35,16 +35,28 @@ def start_receiver(port):
     while True:
         conn, addr = sock.accept()
         print(f'连接来自: {addr}')
-        file_name = conn.recv(1024).decode()  # 接收文件名
-        unique_file_name = get_unique_filename(file_name)
+        file_name = conn.recv(1024).decode('utf-8')  # 接收文件名
+        print(file_name)
+        if not file_name:  # 文件名为空，处理错误
+            print('接收到的文件名为空，忽略该连接。')
+            conn.close()
+            continue
 
-        with open(unique_file_name, 'wb') as f:
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                f.write(data)
-        print(f'文件接收完毕，保存为: {unique_file_name}，来自: {hex_ip}')
+        unique_file_name = get_unique_filename(file_name)
+        print(f'保存文件名: {unique_file_name}')
+
+        try:
+            with open(unique_file_name, 'wb') as f:
+                while True:
+                    data = conn.recv(1024)
+                    if not data:
+                        break
+                    f.write(data)
+            print(f'文件接收完毕，保存为: {unique_file_name}，来自: {hex_ip}')
+        except Exception as e:
+            print(f'保存文件时出错: {e}')
+        
+        conn.sendall(b'FILE_RECEIVED')
         conn.close()
 
 if __name__ == '__main__':

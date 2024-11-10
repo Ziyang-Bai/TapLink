@@ -11,4 +11,4 @@ def scan_network(network, port):
         sock.close()
 
 if __name__ == '__main__':
-    scan_network('192.168.1.0/24', 5001)  # 替换为你的网络地址范围
+    scan_network('192.168.3.1/10', 5001)  # 替换为你的网络地址范围
